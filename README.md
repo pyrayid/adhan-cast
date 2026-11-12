@@ -1,6 +1,6 @@
 # Adhan Cast
 
-Plays the adhan on your Google Cast speakers (Nest Mini, Nest Audio, Nest Hub, Chromecast, speaker groups) at each prayer time, with an optional second alert after each adhan. Runs on your Windows PC; you control it from a web dashboard.
+Plays the adhan on your Google Cast speakers (Nest Mini, Nest Audio, Nest Hub, Chromecast, speaker groups) at each prayer time, with an optional iqama alert for each prayer. Runs on your Windows PC; you control it from a web dashboard.
 
 ## Setup (once)
 
