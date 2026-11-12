@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adhan Cast</title>
+<style>
+:root{
+  --bg:#f5f3ee;--card:#fff;--ink:#1c2422;--muted:#6a756f;--line:#e4e0d6;
+  --accent:#0f6e64;--accent-soft:#e3f1ee;--accent-ink:#fff;--warn:#a85d00;--warn-soft:#fbefdc;--err:#b42318;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f1413;--card:#171e1c;--ink:#e7ecea;--muted:#94a19b;--line:#27312e;
+    --accent:#3cc7b4;--accent-soft:#14302c;--accent-ink:#04201c;--warn:#f0a548;--warn-soft:#33260f;--err:#f97066;--shadow:none}
+}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 96px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px}
+h1{margin:0;font-size:24px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13px;font-weight:400}
+.next{background:var(--accent);color:var(--accent-ink);border-radius:14px;padding:12px 16px;min-width:250px}
+.next .k{font-size:12px;opacity:.85;text-transform:uppercase;letter-spacing:.06em}
+.next .v{font-size:20px;font-weight:600}
+.next .c{font-variant-numeric:tabular-nums;opacity:.9;font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+h3{font-size:13px;margin:14px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+tr:last-child td{border-bottom:0}
+tr.past td{color:var(--muted)}
+.pill{display:inline-block;font-size:12.5px;padding:1px 9px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.pill.off{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.tag{font-size:11px;color:var(--warn);margin-left:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px}
+.ph .n{font-size:17px;font-weight:600}
+.ph .n span{color:var(--muted);font-weight:400;font-size:13px;margin-left:6px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:8px 0}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);flex:1 1 140px;min-width:0}
+input[type=text],input[type=number],input[type=time],select{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:14px}
+.sw input{width:18px;height:18px;accent-color:var(--accent)}
+.sec{border-top:1px dashed var(--line);margin-top:12px;padding-top:12px}
+.dim{opacity:.45}
+button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button.small{padding:4px 10px;font-size:13px}
+.savebar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;display:flex;justify-content:center;gap:12px;align-items:center;transform:translateY(110%);transition:transform .2s}
+.savebar.show{transform:none}
+.log{font:12.5px/1.5 ui-monospace,Consolas,monospace;max-height:260px;overflow:auto}
+.log div{padding:3px 0;border-bottom:1px solid var(--line)}
+.log .WARNING{color:var(--warn)}.log .ERROR{color:var(--err)}
+.it{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)}
+.it:last-child{border-bottom:0}
+.it .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.muted{color:var(--muted)}
+.note{background:var(--accent-soft);border-radius:8px;padding:8px 10px;font-size:13px;margin:0 0 10px}
+.note.err{color:var(--err)}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.found{border:1px solid var(--accent);border-radius:10px;padding:10px 12px;margin-top:8px}
+.found table td,.found table th{padding:4px 6px;font-size:13px}
+.btns{display:flex;gap:6px;flex-shrink:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9;max-width:90vw}
+.toast.show{opacity:1}
+@media (max-width:760px){.two{grid-template-columns:1fr}.next{width:100%}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="wrap">
+  <header>
+    <div><h1>Adhan Cast</h1><div class="sub" id="sub">Loading…</div></div>
+    <div class="next" id="next"><div class="k">Next</div><div class="v">—</div><div class="c"></div></div>
+  </header>
+
+  <div class="card">
+    <h2><span>Today <span class="sub" id="sunrise"></span></span><button class="small" id="stopall">■ Stop all speakers</button></h2>
+    <div id="srcnote"></div>
+    <div class="tbl"><table><thead><tr><th>Prayer</th><th>Adhan</th><th>Masjid iqama</th><th>Iqama alert</th></tr></thead><tbody id="today"></tbody></table></div>
+  </div>
+
+  <div class="card"><h2>Masjid <button class="small" id="mrefresh">Refresh times</button></h2><div id="masjid"></div></div>
+
+  <div class="grid" id="prayers"></div>
+
+  <div class="two">
+    <div class="card"><h2>General</h2><div id="general"></div></div>
+    <div>
+      <div class="card"><h2>Speakers <button class="small" id="rescan">Rescan</button></h2><div id="speakers"></div></div>
+      <div class="card"><h2>Sounds <button class="small" id="upload">Upload audio</button></h2>
+        <input type="file" id="file" accept=".mp3,.m4a,.aac,.wav,.ogg,.flac,audio/*" hidden>
+        <div id="sounds"></div></div>
+    </div>
+  </div>
+
+  <div class="card"><h2>Activity</h2><div class="log" id="log"></div></div>
+</div>
+<div class="savebar" id="savebar"><span>Unsaved changes</span><button id="discard">Discard</button><button class="primary" id="save">Save changes</button></div>
+
+<script>
+const PR=["fajr","dhuhr","asr","maghrib","isha"];
+const NAME={fajr:"Fajr",dhuhr:"Dhuhr",asr:"Asr",maghrib:"Maghrib",isha:"Isha"};
+const DEFAULTS=["default-adhan-tone.wav","default-alert-chime.wav"];
+let S=null, ST=null, dirty=false, pending=false, speakerKey="", preview=null, previewName=null, found=null, mq="";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const t12=v=>{if(!v)return"—";let[h,m]=v.split(":").map(Number);const ap=h>=12?"PM":"AM";h=h%12||12;return`${h}:${String(m).padStart(2,"0")} ${ap}`};
+
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),3500)}
+async function api(path,opt={}){
+  const o={...opt};
+  if(o.body&&!(o.body instanceof FormData)){o.headers={"Content-Type":"application/json"};o.body=JSON.stringify(o.body)}
+  const r=await fetch(path,o); let j={}; try{j=await r.json()}catch(e){}
+  if(!r.ok) throw new Error(j.detail||r.statusText); return j;
+}
+const get=p=>p.split(".").reduce((o,k)=>o[k],S);
+function set(p,v){const ks=p.split("."),last=ks.pop();ks.reduce((o,k)=>o[k],S)[last]=v}
+function setDirty(d){dirty=d;$("savebar").classList.toggle("show",d)}
+const opts=(pairs,sel)=>pairs.map(([v,l])=>`<option value="${esc(v)}"${v===sel?" selected":""}>${esc(l)}</option>`).join("");
+
+function speakerOpts(sel,blank){
+  const names=ST.speakers.map(s=>s.name);
+  let h=`<option value="">${esc(blank)}</option>`;
+  for(const s of ST.speakers) h+=`<option value="${esc(s.name)}"${s.name===sel?" selected":""}>${esc(s.name)}${s.type==="group"?" (group)":""}</option>`;
+  if(sel&&!names.includes(sel)) h+=`<option value="${esc(sel)}" selected>${esc(sel)} (not found)</option>`;
+  return h;
+}
+function soundOpts(sel){
+  let h=ST.sounds.map(n=>`<option value="${esc(n)}"${n===sel?" selected":""}>${esc(n)}</option>`).join("");
+  if(sel&&!ST.sounds.includes(sel)) h+=`<option value="${esc(sel)}" selected>${esc(sel)} (missing)</option>`;
+  return h;
+}
+const f={
+  sel:(l,p,o,rr)=>`<label class="f">${l}<select data-p="${p}" data-t="s"${rr?" data-rr":""}>${o}</select></label>`,
+  num:(l,p,min,max,step=1)=>`<label class="f">${l}<input type="number" data-p="${p}" data-t="n" min="${min}" max="${max}" step="${step}" value="${esc(get(p))}"></label>`,
+  txt:(l,p,ph="")=>`<label class="f">${l}<input type="text" data-p="${p}" data-t="s" placeholder="${esc(ph)}" value="${esc(get(p))}"></label>`,
+  time:(l,p)=>`<label class="f">${l}<input type="time" data-p="${p}" data-t="s" value="${esc(get(p))}"></label>`,
+  vol:(l,p)=>`<label class="f">${l} · <span data-vol="${p}">${Math.round(get(p)*100)}%</span><input type="range" min="0" max="1" step="0.05" data-p="${p}" data-t="n" value="${get(p)}"></label>`,
+  sw:(l,p)=>`<label class="sw"><input type="checkbox" data-p="${p}" data-t="b" data-rr${get(p)?" checked":""}>${l}</label>`,
+};
+
+function renderPrayers(){
+  $("prayers").innerHTML=PR.map(p=>{
+    const b=`prayers.${p}`,P=S.prayers[p],Q=P.iqama,row=ST.rows.find(r=>r.prayer===p)||{};
+    const when=opts([["iqama","Relative to masjid iqama"],["adhan","Relative to adhan"],["at","At a set time"]],Q.mode);
+    const dir=opts([["before","Before"],["after","After"]],Q.dir);
+    const nm=NAME[p];
+    return `<div class="card">
+      <div class="ph"><div class="n">${nm}<span>Adhan ${row.adhan_at||"—"} · Iqama ${row.iqama||"—"}</span></div>${f.sw("Adhan",b+".enabled")}</div>
+      <div class="${P.enabled?"":"dim"}">
+        <div class="row">${f.sel(p==="fajr"?"Fajr adhan sound":"Adhan sound",b+".sound",soundOpts(P.sound))}${f.sel("Speaker",b+".speaker",speakerOpts(P.speaker,"Default speaker"))}</div>
+        <div class="row">${f.vol("Volume",b+".volume")}${f.num("Shift (min)",b+".offset",-30,30)}</div>
+        <div class="row"><button class="small" data-test="${p}:adhan">▶ Test adhan</button></div>
+      </div>
+      <div class="sec">
+        <div class="row">${f.sw("Iqama alert",b+".iqama.enabled")}</div>        <div class="${Q.enabled?"":"dim"}">
+          <div class="row">${f.sel("When",b+".iqama.mode",when,true)}</div>
+          <div class="row">${Q.mode==="at"?f.time("Time",b+".iqama.time"):f.num("Minutes (0 = exactly at)",b+".iqama.minutes",0,240)+f.sel("Before / after",b+".iqama.dir",dir)}</div>
+          <div class="row">${f.sel("Sound",b+".iqama.sound",soundOpts(Q.sound))}${f.sel("Speaker",b+".iqama.speaker",speakerOpts(Q.speaker,"Same as adhan"))}</div>
+          <div class="row">${f.vol("Volume",b+".iqama.volume")}</div>
+          <div class="row"><button class="small" data-test="${p}:iqama">▶ Test iqama alert</button></div>
+        </div>
+      </div></div>`;
+  }).join("")+jumuahCard();
+}
+function jumuahCard(){
+  const J=S.jumuah,I=ST.jumuah||{},t=k=>I[k]||"not listed";
+  const which=opts([["jummah1",`Jumu'ah 1 · ${t("jummah1")}`],["jummah2",`Jumu'ah 2 · ${t("jummah2")}`]],J.which);
+  return `<div class="card">
+    <div class="ph"><div class="n">Jumu'ah<span>${esc(I.day||"")}${I.jummah1?" · "+I.jummah1:""}${I.jummah2?" / "+I.jummah2:""}</span></div>${f.sw("Alert","jumuah.enabled")}</div>
+    <div class="${J.enabled?"":"dim"}">
+      <div class="row">${f.sel("Alert for","jumuah.which",which)}${f.num("Minutes before (0 = at the time)","jumuah.minutes",0,120)}</div>
+      <div class="row">${f.sel("Sound","jumuah.sound",soundOpts(J.sound))}${f.sel("Speaker","jumuah.speaker",speakerOpts(J.speaker,"Default speaker"))}</div>
+      <div class="row">${f.vol("Volume","jumuah.volume")}</div>
+      <div class="row"><button class="small" data-test="jumuah:jumuah">▶ Test Jumu'ah alert</button></div>
+    </div>
+    <p class="sub">Plays on Fridays in addition to the Dhuhr adhan and Dhuhr iqama alert. If the chosen Jumu'ah has no time listed, it is skipped.</p>
+  </div>`;
+}
+function jumuahRow(){
+  const J=ST.jumuah,times=[J.jummah1,J.jummah2].filter(Boolean).join(" / ")||"—";
+  return `<tr class="${J.past?"past":""}"><td><b>Jumu'ah</b></td><td><span class="muted">—</span></td><td>${times}</td>
+    <td>${J.on?`<span class="pill">${J.alert_at}</span>`:J.skip?`<span class="pill off">Skipped</span><span class="tag">no time listed</span>`:`<span class="pill off">Off</span>`}</td></tr>`;
+}
+
+function renderMasjid(){
+  const M=ST.masjid;
+  let h="";
+  if(S.active_masjid&&M&&M.id===S.active_masjid){
+    h+=`<p class="${M.error?"note warn":"note"}">${M.error?esc(M.error)+"<br>":""}Using <b>${esc(M.name)}</b> · ${M.updated?`times updated ${esc(M.updated)}`:"downloading times…"} · ${M.days} day(s) stored${M.busy?" · updating…":""}</p>`;
+  }else if(!S.active_masjid){
+    h+=`<p class="note">No masjid selected. The adhan uses calculated ISNA times, and iqama alerts set “relative to masjid iqama” are skipped.</p>`;
+  }
+  const list=[["","None (calculated times only)"],...S.masjids.map(m=>[m.id,m.name])];
+  h+=`<div class="row">${f.sel("Masjid","active_masjid",opts(list,S.active_masjid))}${f.sel("Adhan times","adhan_source",opts([["masjid","Masjid's posted times"],["calculated","Calculated (ISNA)"]],S.adhan_source))}</div>
+        <p class="sub">If masjid times can't be downloaded, the last stored times are used, then the ISNA calculation. If a prayer has no iqama time that day, its masjid-iqama alert is skipped.</p>
+    <h3>Add a masjid</h3>
+    <div class="row"><label class="f" style="flex:3 1 260px">Masjid website, Masjidal link or masjid ID<input type="text" id="mq" placeholder="e.g. yourmasjid.org" value="${esc(mq)}"></label><button id="lookup">Look up</button></div>`;
+  if(found){
+    const d=found.today||{adhan:{},iqama:{}};
+    h+=`<div class="found"><div class="row"><label class="f">Name<input type="text" id="mname" value="${esc(found.name)}"></label></div>
+      <div class="sub">Masjid ID ${esc(found.id)} · today's times from Masjidal:</div>
+      <div class="tbl"><table><tr><th></th>${PR.map(p=>`<th>${NAME[p]}</th>`).join("")}</tr>
+      <tr><td>Adhan</td>${PR.map(p=>`<td>${t12(d.adhan[p])}</td>`).join("")}</tr>
+      <tr><td>Iqama</td>${PR.map(p=>`<td>${t12(d.iqama[p])}</td>`).join("")}</tr></table></div>
+      ${d.iqama.jummah1?`<div class="sub">Jumu'ah: ${t12(d.iqama.jummah1)}${d.iqama.jummah2?" and "+t12(d.iqama.jummah2):""}</div>`:""}
+      <div class="row"><button class="primary small" id="madd">Add &amp; use</button><button class="small" id="mcancel">Cancel</button></div></div>`;
+  }
+  if(S.masjids.length){
+    h+=`<h3>Saved masjids</h3>`+S.masjids.map(m=>`<div class="it"><div class="nm"><b>${esc(m.name)}</b> <span class="muted">${esc(m.id)}${m.id===S.active_masjid?" · in use":""}</span></div>
+      <div class="btns"><button class="small" data-mdel="${esc(m.id)}">Remove</button></div></div>`).join("");
+  }
+  $("masjid").innerHTML=h;
+}
+
+function renderGeneral(){
+  $("general").innerHTML=`
+    ${S.default_speaker?"":`<p class="note">Choose a default speaker so the adhan has somewhere to play.</p>`}
+    <div class="row">${f.sel("Default speaker","default_speaker",speakerOpts(S.default_speaker,"— choose a speaker —"))}</div>
+    <div class="row">${f.sel("Asr calculation (fallback)","asr_method",opts([["standard","Standard (Shafi'i, Maliki, Hanbali)"],["hanafi","Hanafi"]],S.asr_method))}</div>
+    <div class="row">${f.txt("Location name","location.name")}${f.txt("Time zone","location.timezone")}</div>
+    <div class="row">${f.num("Latitude","location.lat",-90,90,"any")}${f.num("Longitude","location.lng",-180,180,"any")}</div>
+    <div class="row">${f.txt("This PC's network address (blank = automatic)","host_ip",ST.host_ip_auto)}</div>
+    <div class="row">${f.sw("Keep this PC awake while the app runs","keep_awake")}</div>
+    <p class="sub">The location is used for the ISNA fallback calculation (Fajr and Isha at 15°).</p>`;
+}
+function renderForm(){renderPrayers();renderMasjid();renderGeneral()}
+
+function renderLists(){
+  let h=ST.cast_error?`<p class="note err">${esc(ST.cast_error)}</p>`:"";
+  h+=ST.speakers.length?ST.speakers.map(s=>`<div class="it"><div class="nm"><b>${esc(s.name)}</b> <span class="muted">${esc(s.type==="group"?"Speaker group":s.model||"")} · ${esc(s.host)}</span></div>
+      <div class="btns"><button class="small" data-play="${esc(s.name)}">▶</button><button class="small" data-stop="${esc(s.name)}">■</button></div></div>`).join("")
+    :`<p class="muted">No speakers found yet. Make sure this PC is on the same Wi-Fi as your speakers, then click Rescan.</p>`;
+  $("speakers").innerHTML=h;
+  $("sounds").innerHTML=ST.sounds.map(n=>`<div class="it"><div class="nm">${esc(n)}${DEFAULTS.includes(n)?' <span class="muted">(built-in tone)</span>':""}</div>
+      <div class="btns"><button class="small" data-preview="${esc(n)}">${previewName===n?"■ Stop":"▶ Preview"}</button>${DEFAULTS.includes(n)?"":`<button class="small" data-delsound="${esc(n)}">Delete</button>`}</div></div>`).join("");
+}
+function renderStatus(){
+  const ss=ST.settings, M=ST.masjid;
+  const src=M?(ss.adhan_source==="masjid"?`Times: ${M.name}`:`Iqama: ${M.name} · adhan calculated`):"Times: calculated (ISNA)";
+  $("sub").textContent=`${ST.date} · ${src}`;
+  $("sunrise").textContent=`· Sunrise ${ST.sunrise}${ST.friday?" · Friday":""}`;
+  $("srcnote").innerHTML=M&&!ST.have_masjid_today?`<p class="note warn">No masjid times for today yet, so calculated times are shown${M.error?". "+esc(M.error):"."}</p>`:"";
+  $("today").innerHTML=ST.rows.map(r=>{
+    const calc=M&&ss.adhan_source==="masjid"&&r.adhan_src==="calculated"?`<span class="tag">calc</span>`:"";
+    const nm=NAME[r.prayer];
+    return `<tr class="${r.adhan_past&&(!r.alert_on||r.alert_past)?"past":""}">
+    <td><b>${nm}</b></td>
+    <td>${r.adhan_on?`<span class="pill">${r.adhan_at}</span>`:`<span class="pill off">${r.adhan_at} · off</span>`}${calc}</td>
+    <td>${r.iqama||`<span class="muted">—</span>`}</td>
+    <td>${r.alert_on?`<span class="pill">${r.alert_at}</span>`:r.alert_skip?`<span class="pill off">Skipped</span><span class="tag">no iqama time</span>`:`<span class="pill off">Off</span>`}</td></tr>`}).join("")+(ST.friday&&ST.jumuah?jumuahRow():"");
+  $("log").innerHTML=ST.log.length?ST.log.map(l=>`<div class="${l.level}"><span class="muted">${esc(l.t)}</span> ${esc(l.msg)}</div>`).join(""):`<div class="muted">Nothing yet.</div>`;
+  renderLists(); renderNext();
+}
+function renderNext(){
+  if(!ST) return;
+  const n=ST.next,el=$("next");
+  if(!n){el.querySelector(".k").textContent="Next";el.querySelector(".v").textContent="Nothing scheduled";el.querySelector(".c").textContent="";return}
+  el.querySelector(".k").textContent="Next · "+n.label;
+  el.querySelector(".v").textContent=n.display+(n.day==="tomorrow"?" tomorrow":"");
+  let ms=new Date(n.at)-Date.now();
+  if(ms<=0){ if(!pending){pending=true;setTimeout(()=>refresh().finally(()=>pending=false),5000)} ms=0 }
+  const t=Math.floor(ms/1000),hh=Math.floor(t/3600),mm=Math.floor(t%3600/60),ss=t%60;
+  el.querySelector(".c").textContent=`in ${hh?hh+"h ":""}${mm}m ${String(ss).padStart(2,"0")}s${n.speaker?" on "+n.speaker:""}`;
+}
+async function refresh(full){
+  try{ ST=await api("/api/state") }catch(e){ $("sub").textContent="Can't reach Adhan Cast. Is it running?"; return }
+  const M=ST.masjid||{};
+  const key=ST.speakers.map(s=>s.name).join("|")+"#"+ST.sounds.join("|")+"#"+[M.updated,M.days,M.error,M.busy].join("|");
+  const typing=document.activeElement&&["mq","mname"].includes(document.activeElement.id);
+  if(full||!S){S=structuredClone(ST.settings);setDirty(false);renderForm()}
+  else if(key!==speakerKey&&!typing) renderForm();
+  speakerKey=key; renderStatus();
+}
+
+document.addEventListener("input",e=>{
+  const el=e.target;
+  if(el.id==="mq"){mq=el.value;return}
+  if(el.id==="mname"&&found){found.name=el.value;return}
+  if(!el.dataset||!el.dataset.p) return;
+  const t=el.dataset.t; const v=t==="b"?el.checked:t==="n"?(el.value===""?"":Number(el.value)):el.value;
+  set(el.dataset.p,v); setDirty(true);
+  const vs=document.querySelector(`[data-vol="${el.dataset.p}"]`); if(vs) vs.textContent=Math.round(v*100)+"%";
+  if("rr" in el.dataset) renderForm();
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.id==="mq"){e.preventDefault();$("lookup").click()} });
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  try{
+    if(b.dataset.test){
+      const [p,k]=b.dataset.test.split(":");
+      let sp,so,vo;
+      if(p==="jumuah"){const J=S.jumuah;sp=J.speaker||S.default_speaker;so=J.sound;vo=J.volume}
+      else{const P=S.prayers[p];sp=P.speaker||S.default_speaker;so=P.sound;vo=P.volume;
+        if(k==="iqama"){sp=P.iqama.speaker||sp;so=P.iqama.sound;vo=P.iqama.volume}}
+      if(!sp) return toast("Choose a speaker first");
+      await api("/api/test",{method:"POST",body:{speaker:sp,sound:so,volume:vo}}); toast(`Sending to ${sp}…`);
+    }else if(b.dataset.play){
+      await api("/api/test",{method:"POST",body:{speaker:b.dataset.play,sound:"default-alert-chime.wav",volume:0.5}}); toast(`Chime on ${b.dataset.play}…`);
+    }else if(b.dataset.stop){
+      await api("/api/stop",{method:"POST",body:{speaker:b.dataset.stop}}); toast(`Stopping ${b.dataset.stop}`);
+    }else if(b.dataset.preview){
+      const n=b.dataset.preview;
+      if(preview){preview.pause();preview=null}
+      if(previewName===n){previewName=null;renderLists();return}
+      preview=new Audio("/sounds/"+encodeURIComponent(n)); previewName=n;
+      preview.onended=()=>{previewName=null;preview=null;renderLists()};
+      preview.play(); renderLists();
+    }else if(b.dataset.delsound){
+      if(!confirm(`Delete ${b.dataset.delsound}?`)) return;
+      const r=await api("/api/sounds/"+encodeURIComponent(b.dataset.delsound),{method:"DELETE"}); ST.sounds=r.sounds; renderLists(); renderForm();
+    }else if(b.dataset.mdel){
+      S.masjids=S.masjids.filter(m=>m.id!==b.dataset.mdel);
+      if(S.active_masjid===b.dataset.mdel) S.active_masjid="";
+      setDirty(true); renderForm();
+    }else if(b.id==="lookup"){
+      if(!mq.trim()) return toast("Paste a website, Masjidal link or masjid ID");
+      b.disabled=true; b.textContent="Looking up…";
+      try{ found=await api("/api/masjids/lookup",{method:"POST",body:{input:mq}}); renderMasjid() }
+      finally{ b.disabled=false; b.textContent="Look up" }
+    }else if(b.id==="madd"){
+      const m={id:found.id,name:(found.name||"").trim()||`Masjid ${found.id}`,source:found.source};
+      S.masjids=[...S.masjids.filter(x=>x.id!==m.id),m]; S.active_masjid=m.id;
+      found=null; mq=""; setDirty(true); renderForm(); toast("Added. Click Save changes to start using it.");
+    }else if(b.id==="mcancel"){
+      found=null; renderMasjid();
+    }else if(b.id==="mrefresh"){
+      if(dirty) return toast("Save your changes first");
+      b.disabled=true; b.textContent="Refreshing…";
+      try{ await api("/api/masjids/refresh",{method:"POST"}); toast("Masjid times updated"); await refresh() }
+      finally{ b.disabled=false; b.textContent="Refresh times" }
+    }else if(b.id==="save"){
+      b.disabled=true; await api("/api/settings",{method:"PUT",body:S}); toast("Saved"); await refresh(true);
+      setTimeout(()=>refresh(),4000);
+    }else if(b.id==="discard"){
+      S=structuredClone(ST.settings); setDirty(false); renderForm();
+    }else if(b.id==="rescan"){
+      b.disabled=true; b.textContent="Scanning…";
+      const r=await api("/api/speakers/refresh",{method:"POST"}); ST.speakers=r.speakers; ST.cast_error=r.cast_error;
+      renderLists(); renderForm(); toast(`${r.speakers.length} speaker(s) found`);
+    }else if(b.id==="stopall"){
+      const r=await api("/api/stop",{method:"POST",body:{}}); toast(r.stopped.length?`Stopping ${r.stopped.join(", ")}`:"No speakers configured");
+    }else if(b.id==="upload"){ $("file").click() }
+  }catch(x){ toast(x.message) }
+  finally{ if(b.id==="save") b.disabled=false; if(b.id==="rescan"){b.disabled=false;b.textContent="Rescan"} }
+});
+$("file").addEventListener("change",async e=>{
+  const fl=e.target.files[0]; if(!fl) return;
+  const fd=new FormData(); fd.append("file",fl);
+  try{ const r=await api("/api/sounds",{method:"POST",body:fd}); ST.sounds=r.sounds; renderLists(); renderForm(); toast(`Added ${r.name}`) }
+  catch(x){ toast(x.message) }
+  e.target.value="";
+});
+window.addEventListener("beforeunload",e=>{ if(dirty){e.preventDefault();e.returnValue=""} });
+
+refresh(true);
+setTimeout(()=>refresh(),5000);   // speakers and masjid times usually arrive a few seconds after start
+setInterval(()=>refresh(),30000);
+setInterval(renderNext,1000);
+</script>
+</body>
+</html>

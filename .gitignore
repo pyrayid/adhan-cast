@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Runtime / personal state
+settings.json
+*.tmp
+masjid_cache.json
+adhan.log
+adhan.pid
+
+# Uploaded audio stays local; only the built-in tones are tracked
+sounds/*
+!sounds/default-adhan-tone.wav
+!sounds/default-alert-chime.wav
